@@ -5,9 +5,9 @@ checkpoint_path: /explore/nobackup/projects/ilab/data/ACE/checkpoints/ace_ckpt.t
 log_video: false
 logging:
   log_to_screen: true
-  log_to_wandb: false
+  log_to_wandb: true
   log_to_file: true
-  project: ace
+  project: FMACE
   entity: nasa-ilab
 validation_data:
   batch_size:   1
