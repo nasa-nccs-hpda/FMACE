@@ -7,9 +7,12 @@ Foundation Model based on ACE Framework [arxiv:2310.02074](https://arxiv.org/abs
 
 	> conda create --name fme --clone fmod
     > conda activate fme
-    > git clone https://github.com/ai2cm/ace.git
     > pip install toolz dask
-	> cd ace/fme
-    > pip install .
+    > git clone https://github.com/ai2cm/ace.git
+    > cd FMACE
+    > ln -s ./ace/fme/fme ./fme
+
+	>> cd ../ace/fme
+    >> pip install .
 
 
