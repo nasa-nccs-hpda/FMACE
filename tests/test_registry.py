@@ -11,7 +11,8 @@ def test_sfno_builder():
 
     sfno_net = builder.build(1, 1, (16, 32))
 
-    print( f"sfno_net.trans_down.grid = {sfno_net.trans_down.grid}" )
+    print( f"\nsfno_net.trans_down: {sfno_net.trans_down}")
+    print( f"sfno_net.trans_down.grid = {sfno_net.trans_down.grid}\n" )
 
     assert (
         sfno_net.trans_down.grid == "legendre-gauss"
