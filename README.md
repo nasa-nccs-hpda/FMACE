@@ -28,4 +28,13 @@ Foundation Model based on ACE Framework [arxiv:2310.02074](https://arxiv.org/abs
     >> cd FMACE
     >> pytest
 
+## Run Inference
+
+### Pretrained 
+
+    >> cd FMACE
+    >> python -m fmace.pipeline.inference config/explore-inference.yaml
+
+### MERRA2 Fine-tuned 
+
 
