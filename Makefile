@@ -4,3 +4,6 @@ unit_tests_cpu:
 
 unit_tests:
 	pytest --durations 10 .
+
+inference:
+    python -m fme.fcn_training.inference.inference config/explore-inference.yaml
