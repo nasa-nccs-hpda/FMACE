@@ -29,6 +29,7 @@ with open(os.path.join(config.experiment_dir, "config.yaml"), "w") as f:
 # logging_utils.log_versions()
 # logging_utils.log_beaker_url()
 # logging_utils.log_slurm_info()
+print("Config loaded")
 
 stepper_config: SingleModuleStepperConfig = config.load_stepper_config()
 data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=config.n_forward_steps )
