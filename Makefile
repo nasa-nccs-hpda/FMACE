@@ -7,3 +7,6 @@ unit_tests:
 
 inference:
     python -m fme.fcn_training.inference.inference config/explore-inference.yaml
+
+fmace-inference:
+    python -m fmace.pipeline.inference config/explore-inference.yaml
