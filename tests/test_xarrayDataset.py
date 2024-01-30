@@ -34,6 +34,9 @@ print("Config loaded")
 stepper_config: SingleModuleStepperConfig = config.load_stepper_config()
 data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=config.n_forward_steps )
 
+print(stepper_config)
+print(data_requirements)
+
 dataset = XarrayDataset( config.validation_data, requirements=data_requirements, window_time_slice=window_time_slice )
 
 print( dataset )

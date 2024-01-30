@@ -29,6 +29,10 @@ def _load_stepper_config(checkpoint_file: str) -> SingleModuleStepperConfig:
     checkpoint = torch.load(checkpoint_file, map_location=fme.get_device())
     return SingleModuleStepperConfig.from_state(checkpoint["stepper"]["config"])
 
+def _get_stepper_config(checkpoint_file: str) -> SingleModuleStepperConfig:
+    checkpoint = torch.load(checkpoint_file, map_location=fme.get_device())
+    return SingleModuleStepperConfig.from_state(checkpoint["stepper"]["config"])
+
 
 def _load_stepper(
     checkpoint_file: str,
@@ -119,7 +123,11 @@ class InferenceConfig:
             sigma_coordinates=sigma_coordinates,
         )
 
-    def load_stepper_config(self) -> SingleModuleStepperConfig:
+    def load_ace_stepper_config(self) -> SingleModuleStepperConfig:
+        logging.info(f"Loading trained model checkpoint from {self.checkpoint_path}")
+        return _load_stepper_config(self.checkpoint_path)
+
+    def get_stepper_config(self) -> SingleModuleStepperConfig:
         logging.info(f"Loading trained model checkpoint from {self.checkpoint_path}")
         return _load_stepper_config(self.checkpoint_path)
 

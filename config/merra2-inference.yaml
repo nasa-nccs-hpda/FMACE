@@ -1,0 +1,17 @@
+experiment_dir: /explore/nobackup/projects/ilab/data/ACE/merra2
+n_forward_steps: 400
+forward_steps_in_memory: 100
+checkpoint_path: /explore/nobackup/projects/ilab/data/ACE/checkpoints/ace_ckpt.tar
+log_video: false
+logging:
+  log_to_screen: true
+  log_to_wandb: true
+  log_to_file: true
+  project: FMACE
+  entity: nasa-ilab
+validation_data:
+  batch_size:   1
+  data_path: /explore/nobackup/projects/ilab/data/ACE/repeating-climSST-1deg-netCDFs/validation/ic_0011
+  data_type: xarray
+  num_data_workers: 4
+  n_samples: 1
