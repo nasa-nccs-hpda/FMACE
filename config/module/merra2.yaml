@@ -1,0 +1,11 @@
+embed_dim: 256
+filter_type: linear
+hard_thresholding_fraction: 1.0
+use_mlp: True
+normalization_layer: instance_norm
+num_layers: 8
+operator_type: dhconv
+scale_factor: 1
+separable: False
+spectral_layers: 3
+spectral_transform: sht

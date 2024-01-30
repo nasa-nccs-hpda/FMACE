@@ -22,6 +22,8 @@ if not os.path.isdir(config.experiment_dir): os.makedirs(config.experiment_dir)
 with open(os.path.join(config.experiment_dir, "config.yaml"), "w") as f:
 	yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
+print(config)
+
 # config.configure_logging(log_filename="inference_out.log")
 # config.configure_wandb()
 # gcs_utils.authenticate()

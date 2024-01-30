@@ -5,182 +5,43 @@ import os
 import time
 from pathlib import Path
 from typing import Optional, Sequence
-
+from fme.core.data_loading.requirements import DataRequirements
 import dacite
 import torch
-import yaml
+import yaml, hydra
 
 import fme
 from fme.core import SingleModuleStepper
 from fme.core.aggregator.inference.main import InferenceAggregator
 from fme.core.data_loading.get_loader import get_data_loader
-from fme.core.data_loading.params import DataLoaderParams
-from fme.core.data_loading.typing import GriddedData, SigmaCoordinates
-from fme.core.dicts import to_flat_dict
-from fme.core.stepper import SingleModuleStepperConfig
+from fmod.base.util.config import cfg, cfg2meta, configure
 from fme.core.wandb import WandB
-from fme.fcn_training.inference.data_writer import DataWriter
 from fme.fcn_training.inference.loop import run_dataset_inference, run_inference
 from fme.fcn_training.train_config import LoggingConfig
 from fme.fcn_training.utils import gcs_utils, logging_utils
+from fmace.pipeline.config import get_stepper_config
 
 
-def _load_stepper_config(checkpoint_file: str) -> SingleModuleStepperConfig:
-    checkpoint = torch.load(checkpoint_file, map_location=fme.get_device())
-    return SingleModuleStepperConfig.from_state(checkpoint["stepper"]["config"])
+def main( configuration: str ):
 
-def _get_stepper_config(checkpoint_file: str) -> SingleModuleStepperConfig:
-    checkpoint = torch.load(checkpoint_file, map_location=fme.get_device())
-    return SingleModuleStepperConfig.from_state(checkpoint["stepper"]["config"])
+    hydra.initialize(version_base=None, config_path="../config")
+    configure( configuration )
 
+ #   if not os.path.isdir(config.experiment_dir):
+ #       os.makedirs(config.experiment_dir)
+ #   config.configure_logging(log_filename="inference_out.log")
+ #   config.configure_wandb()
+ #   gcs_utils.authenticate()
 
-def _load_stepper(
-    checkpoint_file: str,
-    area: torch.Tensor,
-    sigma_coordinates: SigmaCoordinates,
-) -> SingleModuleStepper:
-    checkpoint = torch.load(checkpoint_file, map_location=fme.get_device())
-    stepper = SingleModuleStepper.from_state(
-        checkpoint["stepper"], area=area, sigma_coordinates=sigma_coordinates
-    )
-    return stepper
-
-
-@dataclasses.dataclass
-class InferenceConfig:
-    """
-    Configuration for running inference.
-
-    Attributes:
-        experiment_dir: Directory to save results to.
-        n_forward_steps: Number of steps to run the model forward for. Must be divisble
-            by forward_steps_in_memory.
-        checkpoint_path: Path to stepper checkpoint to load.
-        logging: configuration for logging.
-        validation_data: Configuration for validation data.
-        prediction_data: Configuration for prediction data to evaluate. If given,
-            model evaluation will not run, and instead predictions will be evaluated.
-            Model checkpoint will still be used to determine inputs and outputs.
-        log_video: Whether to log videos of the state evolution.
-        log_extended_video: Whether to log wandb videos of the predictions with
-            statistical metrics, only done if log_video is True.
-        log_extended_video_netcdfs: Whether to log videos of the predictions with
-            statistical metrics as netcdf files.
-        log_zonal_mean_images: Whether to log zonal-mean images (hovmollers) with a
-            time dimension.
-        save_prediction_files: Whether to save the predictions as a netcdf file.
-        save_raw_prediction_names: Names of variables to save in the predictions
-             netcdf file. Ignored if save_prediction_files is False.
-        forward_steps_in_memory: Number of forward steps to complete in memory
-            at a time, will load one more step for initial condition.
-    """
-
-    experiment_dir: str
-    n_forward_steps: int
-    checkpoint_path: str
-    logging: LoggingConfig
-    validation_data: DataLoaderParams
-    prediction_data: Optional[DataLoaderParams] = None
-    log_video: bool = True
-    log_extended_video: bool = False
-    log_extended_video_netcdfs: bool = False
-    log_zonal_mean_images: bool = True
-    save_prediction_files: bool = True
-    save_raw_prediction_names: Optional[Sequence[str]] = None
-    forward_steps_in_memory: int = 1
-
-    def __post_init__(self):
-        if self.n_forward_steps % self.forward_steps_in_memory != 0:
-            raise ValueError(
-                "n_forward_steps must be divisible by steps_in_memory, "
-                f"got {self.n_forward_steps} and {self.forward_steps_in_memory}"
-            )
-
-    def configure_logging(self, log_filename: str):
-        self.logging.configure_logging(self.experiment_dir, log_filename)
-
-    def configure_wandb(self):
-        self.logging.configure_wandb(
-            config=to_flat_dict(dataclasses.asdict(self)), resume=False
-        )
-
-    def configure_gcs(self):
-        self.logging.configure_gcs()
-
-    def load_stepper(
-        self, area: torch.Tensor, sigma_coordinates: SigmaCoordinates
-    ) -> SingleModuleStepper:
-        """
-        Args:
-            area: A tensor of shape (n_lat, n_lon) containing the area of
-                each grid cell.
-            sigma_coordinates: The sigma coordinates of the model.
-        """
-        logging.info(f"Loading trained model checkpoint from {self.checkpoint_path}")
-        return _load_stepper(
-            self.checkpoint_path,
-            area=area,
-            sigma_coordinates=sigma_coordinates,
-        )
-
-    def load_ace_stepper_config(self) -> SingleModuleStepperConfig:
-        logging.info(f"Loading trained model checkpoint from {self.checkpoint_path}")
-        return _load_stepper_config(self.checkpoint_path)
-
-    def get_stepper_config(self) -> SingleModuleStepperConfig:
-        logging.info(f"Loading trained model checkpoint from {self.checkpoint_path}")
-        return _load_stepper_config(self.checkpoint_path)
-
-    def get_data_writer(self, validation_data: GriddedData) -> DataWriter:
-        n_samples = get_n_samples(validation_data.loader)
-        return DataWriter(
-            path=self.experiment_dir,
-            n_samples=n_samples,
-            n_timesteps=self.n_forward_steps + 1,
-            metadata=validation_data.metadata,
-            coords=validation_data.coords,
-            enable_prediction_netcdfs=self.save_prediction_files,
-            save_names=self.save_raw_prediction_names,
-            enable_video_netcdfs=self.log_extended_video_netcdfs,
-        )
-
-
-def get_n_samples(data_loader):
-    n_samples = 0
-    for batch in data_loader:
-        n_samples += next(iter(batch.data.values())).shape[0]
-    return n_samples
-
-
-def main( yaml_config: str ):
-
-    with open(yaml_config, "r") as f:
-        data = yaml.safe_load(f)
-    config = dacite.from_dict(
-        data_class=InferenceConfig,
-        data=data,
-        config=dacite.Config(strict=True),
-    )
-
-    if not os.path.isdir(config.experiment_dir):
-        os.makedirs(config.experiment_dir)
-    with open(os.path.join(config.experiment_dir, "config.yaml"), "w") as f:
-        yaml.dump(data, f, default_flow_style=False, sort_keys=False)
-    config.configure_logging(log_filename="inference_out.log")
-    config.configure_wandb()
-    gcs_utils.authenticate()
-
-    torch.backends.cudnn.benchmark = True
+  #  torch.backends.cudnn.benchmark = True
 
     logging_utils.log_versions()
     logging_utils.log_beaker_url()
     logging_utils.log_slurm_info()
 
-    stepper_config = config.load_stepper_config()
+    stepper_config = get_stepper_config()
     logging.info("Loading inference data")
-    data_requirements = stepper_config.get_data_requirements(
-        n_forward_steps=config.n_forward_steps
-    )
+    data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=cfg().model.n_forward_steps )
 
     def _get_data_loader(window_time_slice: Optional[slice] = None):
         """
@@ -198,7 +59,7 @@ def main( yaml_config: str ):
     # use window_time_slice to avoid loading a large number of timesteps
     validation = _get_data_loader(window_time_slice=slice(0, 1))
 
-    stepper = config.load_stepper(
+    stepper = stepper_config.load_stepper(
         validation.area_weights.to(fme.get_device()),
         sigma_coordinates=validation.sigma_coordinates.to(fme.get_device()),
     )

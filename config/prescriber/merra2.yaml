@@ -1,0 +1,4 @@
+prescribed_name: surface_temperature
+mask_name: ocean_fraction
+mask_value: 1
+interpolate: False
