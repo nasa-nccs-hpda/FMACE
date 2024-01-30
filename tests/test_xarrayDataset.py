@@ -12,7 +12,7 @@ from fme.core.stepper import SingleModuleStepperConfig
 #from fme.core.data_loading.params import DataLoaderParams
 #from fme.fcn_training.utils import gcs_utils, logging_utils
 
-yaml_config = Path(__file__).parent.parent.joinpath("ace-config/explore-inference.yaml").resolve()
+yaml_config = Path(__file__).parent.parent.joinpath("ace_config/explore-inference.yaml").resolve()
 with open(yaml_config, "r") as f:
 	data = yaml.safe_load(f)
 
