@@ -31,7 +31,7 @@ def main():
 
   #  torch.backends.cudnn.benchmark = True
 
-    print( str(dict(cfg()).keys()) )
+    print( list(dict(cfg()).keys()) )
     logging_utils.log_versions()
     logging_utils.log_beaker_url()
     logging_utils.log_slurm_info()

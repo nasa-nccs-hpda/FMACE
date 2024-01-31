@@ -8,6 +8,7 @@ Foundation Model based on ACE Framework [arxiv:2310.02074](https://arxiv.org/abs
 	> conda create --name fme --clone fmod
     > conda activate fme
     > pip install toolz dask dacite
+    > pip install hydra-core --upgrade
     > git clone https://github.com/ai2cm/ace.git
     > cd FMACE
     > ln -s ./ace/fme/fme ./fme
@@ -29,6 +30,10 @@ Foundation Model based on ACE Framework [arxiv:2310.02074](https://arxiv.org/abs
     >> pytest
 
 ## Run Inference
+
+    >> cd FMACE
+    >> make inference
+    >> make fmace-inference
 
 ### Pretrained 
 
