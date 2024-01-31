@@ -12,7 +12,5 @@ norm:
   global_means_path: '/statsdata/centering.nc'
   global_stds_path: '/statsdata/scaling.nc'
   exclude_names: None
-  means:
-    default: None
-  stds:
-    default: None
+  means: {}
+  stds: {}
