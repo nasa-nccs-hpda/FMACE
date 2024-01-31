@@ -31,11 +31,12 @@ def main():
 
   #  torch.backends.cudnn.benchmark = True
 
+    print( str(dict(cfg()).keys()) )
     logging_utils.log_versions()
     logging_utils.log_beaker_url()
     logging_utils.log_slurm_info()
 
-    builder = ModuleSelector(type=cfg().pipline.module, config=cfg().pipline),
+    builder: ModuleSelector = ModuleSelector(type=cfg().pipline.module, config=cfg().pipline),
     stepper_config = get_stepper_config(builder)
     logging.info("Loading inference data")
     data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=cfg().model.n_forward_steps )
