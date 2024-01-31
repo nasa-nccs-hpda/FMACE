@@ -36,7 +36,7 @@ def main():
     logging_utils.log_beaker_url()
     logging_utils.log_slurm_info()
 
-    builder: ModuleSelector = ModuleSelector(type=cfg().pipline.module, config=cfg().pipline),
+    builder: ModuleSelector = ModuleSelector(type=cfg().pipeline.module, config=cfg().pipeline),
     stepper_config = get_stepper_config(builder)
     logging.info("Loading inference data")
     data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=cfg().model.n_forward_steps )
