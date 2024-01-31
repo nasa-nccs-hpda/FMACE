@@ -14,7 +14,7 @@ import fme
 from fme.fcn_training.registry import ModuleSelector
 from fme.core.aggregator.inference.main import InferenceAggregator
 from fme.core.data_loading.get_loader import get_data_loader
-from fmod.base.util.config import cfg, cfg2meta, configure
+from fmod.base.util.config import cfg, cfg2meta, configure, cfgdir
 from fme.core.wandb import WandB
 from fme.fcn_training.inference.loop import run_dataset_inference, run_inference
 from fme.fcn_training.utils import gcs_utils, logging_utils
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("configuration", type=str)
     args = parser.parse_args()
 
-    hydra.initialize(version_base=None, config_path="../../config")
+    hydra.initialize( version_base=None, config_path=cfgdir() )
     configure( args.configuration )
 
     main()
