@@ -182,13 +182,16 @@ class InferenceConfig:
     save_prediction_files: bool = True
     save_raw_prediction_names: Optional[Sequence[str]] = None
     forward_steps_in_memory: int = 1
-    logging: LoggingConfig = cfg2meta("inference.logging", LoggingConfig())
-    validation_data: DataLoaderParams = cfg2meta("inference.validation_data", DataLoaderParams())
-    prediction_data: Optional[DataLoaderParams] = cfg2meta("inference.prediction_data", DataLoaderParams())
+    logging: LoggingConfig = None
+    validation_data: DataLoaderParams = None
+    prediction_data: Optional[DataLoaderParams] = None
 
     @classmethod
     def get_instance(cls):
-        return cfg2meta("inference", InferenceConfig() )
+        icfg = cfg2meta("inference", InferenceConfig() )
+        icfg.logging = cfg2meta("inference.logging", LoggingConfig())
+        icfg.validation_data = cfg2meta("inference.validation_data", DataLoaderParams())
+        icfg.prediction_data = cfg2meta("inference.prediction_data", DataLoaderParams())
 
     def __post_init__(self):
         if self.n_forward_steps % self.forward_steps_in_memory != 0:
