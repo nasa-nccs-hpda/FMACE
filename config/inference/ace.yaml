@@ -1,0 +1,26 @@
+experiment_dir: '/explore/nobackup/projects/ilab/data/ACE/output'
+n_forward_steps: 400
+checkpoint_path: '/explore/nobackup/projects/ilab/data/ACE/checkpoints/ace_ckpt.tar'
+log_video: False
+log_extended_video: False
+log_extended_video_netcdfs: False
+log_zonal_mean_images: True
+save_prediction_files: True
+save_raw_prediction_names: None
+forward_steps_in_memory: 100
+
+logging:
+  project: "fcn_training"
+  entity: "ai2cm"
+  log_to_screen: True
+  log_to_file: True
+  log_to_wandb: True
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+validation_data:
+  data_path: '/explore/nobackup/projects/ilab/data/ACE/repeating-climSST-1deg-netCDFs/validation/ic_0011'
+  data_type: 'xarray'
+  batch_size: 1
+  num_data_workers: 4
+  n_repeats: 1
+  n_samples: 1

@@ -1,0 +1,10 @@
+validation:
+  data_path: /explore/nobackup/projects/ilab/data/ACE/repeating-climSST-1deg-netCDFs/validation/ic_0011
+  data_type: xarray
+  batch_size: 1
+  num_data_workers: 4
+  n_repeats: 1
+  n_samples: 1
+
+
+# prediction_data: None,

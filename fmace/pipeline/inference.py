@@ -9,7 +9,7 @@ from fme.core.data_loading.requirements import DataRequirements
 import dacite
 import torch
 import yaml, hydra
-
+from fmace.pipeline.config import InferenceConfig
 import fme
 from fme.core import SingleModuleStepper
 from fme.core.aggregator.inference.main import InferenceAggregator
@@ -17,7 +17,6 @@ from fme.core.data_loading.get_loader import get_data_loader
 from fmod.base.util.config import cfg, cfg2meta, configure
 from fme.core.wandb import WandB
 from fme.fcn_training.inference.loop import run_dataset_inference, run_inference
-from fme.fcn_training.train_config import LoggingConfig
 from fme.fcn_training.utils import gcs_utils, logging_utils
 from fmace.pipeline.config import get_stepper_config
 
@@ -42,6 +41,7 @@ def main( configuration: str ):
     stepper_config = get_stepper_config()
     logging.info("Loading inference data")
     data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=cfg().model.n_forward_steps )
+    config = InferenceConfig.get_instance()
 
     def _get_data_loader(window_time_slice: Optional[slice] = None):
         """
@@ -128,10 +128,7 @@ def main( configuration: str ):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("yaml_config", type=str)
-
+    parser.add_argument("configuration", type=str)
     args = parser.parse_args()
 
-    main(
-        yaml_config=args.yaml_config,
-    )
+    main( configuration=args.configuration )
