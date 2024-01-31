@@ -129,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("configuration", type=str)
     args = parser.parse_args()
 
-    hydra.initialize( version_base=None, config_path=cfgdir() )
+    hydra.initialize( version_base=None, config_path="../../config" )
     configure( args.configuration )
 
     main()
