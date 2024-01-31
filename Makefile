@@ -9,4 +9,4 @@ inference:
 	python -m "fme.fcn_training.inference.inference" "./ace_config/explore-inference.yaml"
 
 fmace-inference:
-	python -m "fmace.pipeline.inference" "./ace_config/explore-inference.yaml"
+	python -m "fmace.pipeline.inference" "ace"

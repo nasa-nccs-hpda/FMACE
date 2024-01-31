@@ -1,0 +1,8 @@
+defaults:
+  - data: ace
+  - inference: ace
+  - model: ace
+  - pipeline: ace
+  - _self_
+
+cid: ace

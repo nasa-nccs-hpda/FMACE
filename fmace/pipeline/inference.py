@@ -11,7 +11,7 @@ import torch
 import yaml, hydra
 from fmace.pipeline.config import InferenceConfig
 import fme
-from fme.core import SingleModuleStepper
+from fme.fcn_training.registry import ModuleSelector
 from fme.core.aggregator.inference.main import InferenceAggregator
 from fme.core.data_loading.get_loader import get_data_loader
 from fmod.base.util.config import cfg, cfg2meta, configure
@@ -38,7 +38,8 @@ def main( configuration: str ):
     logging_utils.log_beaker_url()
     logging_utils.log_slurm_info()
 
-    stepper_config = get_stepper_config()
+    builder = ModuleSelector(type=cfg().pipline.module, config=cfg().pipline),
+    stepper_config = get_stepper_config(builder)
     logging.info("Loading inference data")
     data_requirements: DataRequirements = stepper_config.get_data_requirements( n_forward_steps=cfg().model.n_forward_steps )
     config = InferenceConfig.get_instance()

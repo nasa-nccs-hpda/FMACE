@@ -1,3 +1,4 @@
+module: "SphericalFourierNeuralOperatorNet"
 embed_dim: 256
 filter_type: linear
 hard_thresholding_fraction: 1.0

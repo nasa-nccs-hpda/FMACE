@@ -83,15 +83,16 @@ class DataLoaderParams:
         if self.n_repeats != 1 and self.data_type == "ensemble_xarray":
             raise ValueError("n_repeats must be 1 when using ensemble_xarray")
 
-def get_stepper_config() -> SingleModuleStepperConfig:
+def get_stepper_config(builder: ModuleSelector) -> SingleModuleStepperConfig:
+    config = cfg().model
     stepper_config: SingleModuleStepperConfig = SingleModuleStepperConfig(
-        builder = ModuleSelector( type="SphericalFourierNeuralOperatorNet", config=cfg().module ),
-        in_names = cfg().model.in_names,
-        out_names = cfg().model.out_names,
-        normalization = cfg2meta('norm', NormalizationConfig() ),
+        builder = builder,
+        in_names = config.in_names,
+        out_names = config.out_names,
+        normalization = cfg2meta( config.norm, NormalizationConfig() ),
         optimization = None,
         corrector = CorrectorConfig(conserve_dry_air=False, zero_global_mean_moisture_advection=False),
-        prescriber = cfg2meta( 'prescriber', PrescriberConfig() ),
+        prescriber = cfg2meta( config.prescriber, PrescriberConfig() ),
         loss = LossConfig(type='LpLoss', kwargs={}, global_mean_type=None, global_mean_kwargs={}, global_mean_weight=1.0) )
     return stepper_config
 
