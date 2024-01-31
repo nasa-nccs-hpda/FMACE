@@ -85,6 +85,7 @@ class DataLoaderParams:
 
 def get_stepper_config(builder: ModuleSelector) -> SingleModuleStepperConfig:
     config = cfg().model
+    print( f"get_stepper_config: norm config= {config.norm}")
     stepper_config: SingleModuleStepperConfig = SingleModuleStepperConfig(
         builder = builder,
         in_names = config.in_names,
