@@ -21,10 +21,7 @@ from fme.fcn_training.utils import gcs_utils, logging_utils
 from fmace.pipeline.config import get_stepper_config
 
 
-def main( configuration: str ):
-
-    hydra.initialize(version_base=None, config_path="../config")
-    configure( configuration )
+def main():
 
  #   if not os.path.isdir(config.experiment_dir):
  #       os.makedirs(config.experiment_dir)
@@ -132,4 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("configuration", type=str)
     args = parser.parse_args()
 
-    main( configuration=args.configuration )
+    hydra.initialize(version_base=None, config_path="../../config")
+    configure( args.configuration )
+
+    main()
